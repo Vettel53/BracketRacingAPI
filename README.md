@@ -47,10 +47,17 @@ All endpoints except `/api/auth/register` and `/api/auth/login` require an `Auth
 ## Running locally
 
 ```
+export JWT_SECRET=<base64-encoded-secret>
 ./mvnw spring-boot:run
 ```
 
-Defaults to the `h2` profile (in-memory DB, fake weather generation enabled). Set `jwt.secret` via `application.properties` or the `JWT_SECRET` env var for the mysql/railway profiles.
+Defaults to the `h2` profile (in-memory DB, fake weather generation enabled). `JWT_SECRET` is required for every profile (no committed default) - generate one locally with:
+
+```
+openssl rand -base64 64
+```
+
+Optionally set `JWT_EXPIRATION_MS` to override the token lifetime (defaults to `3600000`, one hour).
 
 ## Planned
 

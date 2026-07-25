@@ -1,0 +1,215 @@
+{
+	"info": {
+		"name": "BracketRacingAPI",
+		"description": "REST API for tracking 1/8th-mile bracket racing runs. Self-hosted JWT auth (Authorization: Bearer <token>) - not Spring Security.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "jwt",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "runId",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"auth": { "type": "noauth" },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"jdoe\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const body = pm.response.json();",
+									"    if (body.token) {",
+									"        pm.collectionVariables.set('jwt', body.token);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"auth": { "type": "noauth" },
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"jdoe\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const body = pm.response.json();",
+									"    if (body.token) {",
+									"        pm.collectionVariables.set('jwt', body.token);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Runs",
+			"item": [
+				{
+					"name": "Get My Runs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/runs",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "runs"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Run",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2026-07-25\",\n  \"time\": \"14:30:00\",\n  \"car\": \"1969 Camaro\",\n  \"driver\": \"jdoe\",\n  \"track\": \"Atlanta Dragway\",\n  \"lane\": \"Left\",\n  \"dial\": 8.9000,\n  \"reaction\": 0.0120,\n  \"sixtyFoot\": 1.6500,\n  \"halfTrack\": 5.7000,\n  \"fullTrack\": 8.8500,\n  \"speed\": 78.5000\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/runs",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "runs"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Fake Run",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/runs/fake",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "runs", "fake"]
+						},
+						"description": "Only works when `runs.fake-generation.enabled=true` (on by default under the h2 profile)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Run",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"date\": \"2026-07-25\",\n  \"time\": \"15:00:00\",\n  \"car\": \"1969 Camaro\",\n  \"driver\": \"jdoe\",\n  \"track\": \"Atlanta Dragway\",\n  \"lane\": \"Right\",\n  \"dial\": 8.8500,\n  \"reaction\": 0.0150,\n  \"sixtyFoot\": 1.6300,\n  \"halfTrack\": 5.6800,\n  \"fullTrack\": 8.8300,\n  \"speed\": 78.9000\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/runs/{{runId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "runs", "{{runId}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Run",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/runs/{{runId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "runs", "{{runId}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Statistics",
+			"item": [
+				{
+					"name": "Get Statistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/statistics",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "statistics"]
+						},
+						"description": "Returns breakoutPercentage, overPercentage, and averageReactionTime for the authenticated user."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
