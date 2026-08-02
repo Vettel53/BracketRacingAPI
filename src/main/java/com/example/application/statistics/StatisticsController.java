@@ -2,8 +2,9 @@ package com.example.application.statistics;
 
 import com.example.application.account.model.AppUser;
 import com.example.application.account.service.UserService;
-import com.example.application.shared.exception.BusinessException;
+import com.example.application.shared.exception.ApiException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,7 +40,7 @@ public class StatisticsController {
         Long userId = (Long) request.getAttribute("userId");
         AppUser user = userService.getById(userId);
         if (user == null) {
-            throw new BusinessException("Authenticated user no longer exists");
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "USER_NOT_FOUND", "Authenticated user no longer exists");
         }
         return user;
     }

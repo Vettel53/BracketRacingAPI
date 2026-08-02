@@ -5,10 +5,11 @@ import com.example.application.account.service.UserService;
 import com.example.application.run.dto.CreateRunRequest;
 import com.example.application.run.dto.RunResponse;
 import com.example.application.run.dto.UpdateRunRequest;
-import com.example.application.shared.exception.BusinessException;
+import com.example.application.shared.exception.ApiException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,7 +55,7 @@ public class RunController {
     @PostMapping("/fake")
     public ResponseEntity<RunResponse> createFakeRun(HttpServletRequest request) {
         if (!fakeGenerationEnabled) {
-            throw new BusinessException("Fake run generation is disabled on this profile");
+            throw new ApiException(HttpStatus.FORBIDDEN, "FAKE_RUN_DISABLED", "Fake run generation is disabled on this profile");
         }
         AppUser user = currentUser(request);
         Run created = runService.createFakeRun(user);
@@ -79,7 +80,7 @@ public class RunController {
         Long userId = (Long) request.getAttribute("userId");
         AppUser user = userService.getById(userId);
         if (user == null) {
-            throw new BusinessException("Authenticated user no longer exists");
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "USER_NOT_FOUND", "Authenticated user no longer exists");
         }
         return user;
     }
@@ -91,10 +92,10 @@ public class RunController {
     private Run ownedRunOrThrow(HttpServletRequest request, Long runId) {
         AppUser user = currentUser(request);
         Run run = runRepo.findById(runId)
-                .orElseThrow(() -> new BusinessException("Run " + runId + " not found"));
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "RUN_NOT_FOUND", "Run " + runId + " not found"));
 
         if (!run.getUser().getId().equals(user.getId())) {
-            throw new BusinessException("You do not have access to this run");
+            throw new ApiException(HttpStatus.FORBIDDEN, "RUN_ACCESS_DENIED", "You do not have access to this run");
         }
         return run;
     }

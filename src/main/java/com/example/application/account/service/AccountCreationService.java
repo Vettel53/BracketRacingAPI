@@ -2,7 +2,8 @@ package com.example.application.account.service;
 
 import com.example.application.account.model.AppUser;
 import com.example.application.account.repository.UserRepo;
-import com.example.application.shared.exception.BusinessException;
+import com.example.application.shared.exception.ApiException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ public class AccountCreationService {
 
     public AppUser createUser(String username, String rawPassword) {
         if (userRepo.findByUsername(username) != null) {
-            throw new BusinessException("Username '" + username + "' is already taken");
+            throw new ApiException(HttpStatus.CONFLICT, "USERNAME_TAKEN", "Username '" + username + "' is already taken");
         }
 
         AppUser newUser = new AppUser(username, passwordEncoder.encode(rawPassword));

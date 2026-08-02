@@ -1,12 +1,13 @@
 package com.example.application.weather;
 
 import com.example.application.run.Run;
-import com.example.application.shared.exception.BusinessException;
+import com.example.application.shared.exception.ApiException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -71,7 +72,8 @@ public class WeatherService {
                     .block();
         } catch (Exception e) {
             LOGGER.error("Weather API request failed for track {}", raceTrack, e);
-            throw new BusinessException("Weather service is currently unavailable, please try again later");
+            throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "WEATHER_SERVICE_UNAVAILABLE",
+                    "Weather service is currently unavailable, please try again later");
         }
 
         return parseWeatherAPIResponse(jsonResponse);
@@ -117,7 +119,7 @@ public class WeatherService {
             return parsed;
         } catch (Exception e) {
             LOGGER.error("Failed to parse weather API response: {}", jsonResponse, e);
-            throw new BusinessException("Unable to parse weather data");
+            throw new ApiException(HttpStatus.BAD_GATEWAY, "WEATHER_PARSE_ERROR", "Unable to parse weather data");
         }
     }
 
