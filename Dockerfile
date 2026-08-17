@@ -4,10 +4,13 @@ FROM maven:3.9.9-eclipse-temurin-23-alpine AS build
 WORKDIR /app
 
 # Copy the project files to the container
-COPY . /app/
+COPY pom.xml .
 
-# Use Maven to build the project
-RUN mvn clean package -Pproduction
+RUN mvn dependency:go-offline
+
+COPY src ./src
+
+RUN mvn clean package
 
 # Runtime stage to run the application
 FROM eclipse-temurin:23-jdk-alpine AS runtime
@@ -21,4 +24,4 @@ COPY --from=build /app/target/*.jar /app/app.jar
 EXPOSE 8080
 
 # Command to run the application
-CMD ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
