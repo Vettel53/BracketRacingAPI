@@ -18,7 +18,7 @@ import java.util.function.Function;
  * auth on incoming requests.
  */
 @Component
-public class JwtService {
+public final class JwtService {
 
     private final SecretKey signingKey;
     private final long expirationMs;
