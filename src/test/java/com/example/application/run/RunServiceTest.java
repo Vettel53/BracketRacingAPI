@@ -120,39 +120,37 @@ class RunServiceTest {
     }
 
     @Test
-    void updateRun_withNullFields_doesNotChangeThoseFields() {
+    void deleteRun_withValidRun_deletesRun() {
         // Arrange
-        Run existingRun = createSampleRun();
-        UpdateRunRequest updateRequest = new UpdateRunRequest(
-                null, // date
-                null, // time
-                null, // car
-                null, // username
-                null, // track
-                null, // lane
-                null, // dial
-                null, // reaction
-                null, // sixtyFoot
-                null, // halfTrack
-                null, // fullTrack
-                null // speed
-        );
+        Run runToDelete = createSampleRun();
 
         // Act
-        when(runRepo.save(any(Run.class))).then(returnsFirstArg());
-        Run updatedRun = runService.updateRun(existingRun, updateRequest);
+        runService.deleteRun(runToDelete);
 
-        // Assert - all fields should remain unchanged
-        assertThat(updatedRun.getDate()).isEqualTo(existingRun.getDate());
-        assertThat(updatedRun.getTime()).isEqualTo(existingRun.getTime());
-        assertThat(updatedRun.getCar()).isEqualTo(existingRun.getCar());
-        assertThat(updatedRun.getLane()).isEqualTo(existingRun.getLane());
-        assertThat(updatedRun.getDial()).isEqualByComparingTo(existingRun.getDial());
-        assertThat(updatedRun.getReaction()).isEqualByComparingTo(existingRun.getReaction());
-        assertThat(updatedRun.getSixtyFoot()).isEqualByComparingTo(existingRun.getSixtyFoot());
-        assertThat(updatedRun.getHalfTrack()).isEqualByComparingTo(existingRun.getHalfTrack());
-        assertThat(updatedRun.getFullTrack()).isEqualByComparingTo(existingRun.getFullTrack());
-        assertThat(updatedRun.getSpeed()).isEqualByComparingTo(existingRun.getSpeed());
+        // Assert
+        verify(runRepo).delete(runToDelete);
+    }
+
+    @Test
+    void createFakeRun_withValidRun_returnsRun() {
+        // Arrange
+        AppUser owner = new AppUser("jdoe", "hashed-password");
+        Weather fakeWeather = new Weather();
+        when(weatherService.getFakeWeather()).thenReturn(fakeWeather);
+
+        // Act
+        Run created = runService.createFakeRun(owner);
+
+        // Assert - createFakeRun builds a randomized request and delegates to the real
+        // createRun
+        assertThat(created.getUser()).isEqualTo(owner);
+        assertThat(created.getCar()).isEqualTo("Burple Dragster");
+        assertThat(created.getDriver()).isEqualTo("Max");
+        assertThat(created.getTrack()).isEqualTo("Texas Motorplex");
+        assertThat(created.getLane()).isIn("Left", "Right");
+        assertThat(created.getWeather()).isEqualTo(fakeWeather);
+        verify(weatherService).saveWeather(fakeWeather);
+        verify(runRepo).save(created);
     }
 
     Run createSampleRun() {
