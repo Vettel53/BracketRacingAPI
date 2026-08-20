@@ -2,6 +2,7 @@ package com.example.application.weather;
 
 import com.example.application.run.Run;
 import com.example.application.shared.exception.ApiException;
+import java.io.IOException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -117,7 +118,7 @@ public class WeatherService {
             // Barometer/grains/air-density/density-altitude aren't exposed by the
             // upstream API yet - they stay null until TrackWeatherAPI adds them.
             return parsed;
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             LOGGER.error("Failed to parse weather API response: {}", jsonResponse, e);
             throw new ApiException(HttpStatus.BAD_GATEWAY, "WEATHER_PARSE_ERROR", "Unable to parse weather data");
         }
